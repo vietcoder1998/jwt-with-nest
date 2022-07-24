@@ -1,0 +1,21 @@
+{
+    "USER_NOTFOUND": "User not found",
+    "USERNAME_EMPTY": "Username is empty",
+    "ID_EMPTY": "User ID is empty",
+    "USER_LOCKED": "User locked or account not exists",
+    "EMAIL_INVALID": "Email invalid",
+    "EMAIL_HAS_VERIFIED": "Email has verified",
+    "SEND_EMAIL_VALIDATE": "We send email with code valid to your email.",
+    "CODE_VERIFY_EMPTY": "Code is empty",
+    "CODE_VERIFY_INCORRECT": "Code incorrect",
+    "CODE_VERIFY_EXPIRED": "Code expired",
+    "CHECK_CODE_SUCCESS": "Email verify success",
+    "SECRET_2FA_NOT_EXISTS": "2FA secret not exists",
+    "SECRET_2FA_EXISTS": "2FA secret has exists",
+    "AUTHENTICATOR_2FA_INVALID": "Authenticator 2FA invalid",
+    "REMOVE_2FA_SUCCESS": "2FA remove success",
+    "AUTHENTICATOR_2FA_SUCCESS": "Authenticator 2FA success",
+    "SEND_EMAIL_CONFIRM": "We send confirm for new email.",
+    "NEW_EMAIL_MUST_DIFFERENT_CURRENT_EMAIL": "New email must different current",
+    "MIC_NOT_FOUND": "Mic not found"
+}
