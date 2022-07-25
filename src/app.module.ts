@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { FcmModule } from 'nestjs-fcm';
 import { HeaderResolver, I18nJsonParser, I18nModule } from 'nestjs-i18n';
 import * as path from 'path';
-import { AuthenticationMiddleware } from './auth.middleware';
+import { AuthenticationMiddleware } from './modules/auth/auth.middleware';
 import { Profile } from './entities/profile';
 import { User } from './entities/user';
 import { AllExceptionFilter } from './filter/exception.filter';
@@ -49,7 +49,7 @@ import { UserModule } from './modules/user/user.module';
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
       entities: [User, Profile],
-      synchronize: false,
+      synchronize: true,
       logging: false,
     }),
     AuthModule,

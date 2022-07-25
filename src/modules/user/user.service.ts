@@ -1,13 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Http } from '../../helpers/http';
 
 import { InjectRepository } from '@nestjs/typeorm';
-import axios from 'axios';
 import { I18nService } from 'nestjs-i18n';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { User } from '../../entities/user';
-import { Utils } from '../../helpers/utils';
-import { UpdateUserDto } from './user.dto';
 
 @Injectable()
 export class UserService {
@@ -35,6 +31,17 @@ export class UserService {
     }
 
     return user;
+  }
+
+  async find(skip: number, take: number, username: string) {
+    const result = this.usersRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.profile', 'profile')
+      .skip((skip ?? 0) * (take ?? 10))
+      .take(take)
+      .execute();
+
+    return result;
   }
 
   async changePass(uid: string, password: string, lang: string): Promise<any> {

@@ -1,17 +1,33 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsString } from 'class-validator';
 
 export class ChangePassDto {
-  @IsString()
+  @ApiProperty({
+    type: 'string',
+    default: '',
+    required: true,
+  })
+  uid: string;
+
+  @ApiProperty({
+    type: 'string',
+    default: '',
+    required: true,
+  })
   password: string;
 
-  @IsString()
+  @ApiProperty({
+    type: 'string',
+    default: '',
+    required: true,
+  })
   old_password: string;
 }
 
 export class UpdateProfileDto {
-  @IsString()
+  @ApiProperty()
   first_name: string;
 
-  @IsString()
+  @ApiProperty()
   last_name: string;
 }

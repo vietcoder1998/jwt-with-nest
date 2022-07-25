@@ -1,14 +1,24 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
-import { Document } from 'mongoose';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Profile } from './profile';
 
 @Entity('user')
 export class User {
   @PrimaryGeneratedColumn()
   id: string;
 
-  @Column()
+  @Column({ type: 'varchar', length: 16 })
   username: string;
 
-  @Column()
-  password: string;
+  @Column({ type: 'varchar', length: 255 })
+  password?: string;
+
+  @OneToOne(() => Profile, { cascade: true })
+  @JoinColumn()
+  profile: Profile;
 }

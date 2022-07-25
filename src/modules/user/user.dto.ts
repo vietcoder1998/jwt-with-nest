@@ -1,4 +1,5 @@
-import { IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNumber, IsNumberString, IsString } from 'class-validator';
 
 export class ChangePassDto {
   @IsString()
@@ -14,4 +15,23 @@ export class UpdateUserDto {
 
   @IsString()
   last_name: string;
+}
+
+export class QueryUserDto {
+  @ApiProperty({
+    required: false,
+  })
+  username?: string;
+
+  @ApiProperty({
+    required: false,
+  })
+  @ApiProperty()
+  skip: number;
+
+  @ApiProperty({
+    required: false,
+  })
+  @ApiProperty()
+  take: number;
 }

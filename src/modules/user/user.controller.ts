@@ -1,22 +1,25 @@
 import {
   Body,
   Controller,
+  Get,
   Headers,
   HttpException,
   HttpStatus,
+  Param,
   Post,
+  Query,
   Request,
   UseGuards,
-  Param,
 } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
+import { ApiTags } from '@nestjs/swagger';
 import { isEmpty } from 'class-validator';
 import { I18nService } from 'nestjs-i18n';
 import { LoggerService } from '../../logger/index';
-import { AuthService } from '../auth/auth.service';
-import { ChangePassDto } from './user.dto';
+import { ChangePassDto, QueryUserDto } from './user.dto';
 import { UserService } from './user.service';
-import { JwtModule } from '@nestjs/jwt';
 
+@ApiTags('User')
 @Controller('user')
 export class UserController {
   private logger: LoggerService = new LoggerService();
@@ -27,7 +30,8 @@ export class UserController {
   @Post('change-pass')
   async changePass(
     @Body() { password, old_password }: ChangePassDto,
-    @Headers('x-lang') lang: string,
+    @Headers('x-lang')
+    lang: string,
     @Param('uid') uid: string,
     @Request() req,
   ): Promise<any> {
@@ -54,5 +58,14 @@ export class UserController {
     }
 
     return await this.userService.changePass(uid, password, lang);
+  }
+
+  @Get()
+  async find(
+    @Query() { username, skip, take }: QueryUserDto,
+    @Headers('x-lang') lang: string,
+    @Request() req,
+  ): Promise<any> {
+    return await this.userService.find(skip, take, username);
   }
 }
