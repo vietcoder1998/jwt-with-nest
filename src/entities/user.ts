@@ -19,6 +19,6 @@ export class User {
   password?: string;
 
   @OneToOne(() => Profile, { cascade: true })
-  @JoinColumn()
+  @JoinColumn({ name: 'pid' })
   profile: Profile;
 }

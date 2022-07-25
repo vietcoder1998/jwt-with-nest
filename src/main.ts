@@ -1,13 +1,16 @@
+import { ValidationPipe } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
+import { PassportModule } from '@nestjs/passport';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as path from 'path';
+import { middleware } from './app.middleware';
+import { AppModule } from './app.module';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
-import { ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-import { NestExpressApplication } from '@nestjs/platform-express';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { AppModule } from './app.module';
-import { middleware } from './app.middleware';
+
+PassportModule.register({ session: true });
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -28,10 +31,29 @@ async function bootstrap(): Promise<void> {
     .setTitle('Test')
     .setDescription('The cats API description')
     .setVersion('1.0')
+    .addBearerAuth(undefined, 'defaultBearerAuth')
     .build();
 
+  const options = {
+    swaggerOptions: {
+      authAction: {
+        defaultBearerAuth: {
+          name: 'defaultBearerAuth',
+          schema: {
+            description: 'Default',
+            type: 'http',
+            in: 'header',
+            scheme: 'bearer',
+            bearerFormat: 'JWT',
+          },
+          value: '',
+        },
+      },
+    },
+  };
+
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api', app, document, options);
 
   // Express Middleware
   await app.listen(process.env.PORT);

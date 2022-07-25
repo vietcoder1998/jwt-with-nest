@@ -1,21 +1,21 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsEmail } from 'class-validator';
+import { IsEmail, IsString } from 'class-validator';
 
 export class UserCheckDto {
-  @IsString()
+  @ApiProperty()
   username: string;
 
   @IsEmail()
   email: string;
 
-  @IsString()
+  @ApiProperty()
   user_id: string;
 }
 
 export class UserSignInDto {
   @ApiProperty({
     type: 'string',
-    default: 'hello',
+    default: 'hello_world',
   })
   username: string;
 
@@ -27,29 +27,59 @@ export class UserSignInDto {
 }
 
 export class RegisterDto {
-  @IsString()
+  @ApiProperty()
   username: string;
 
-  @IsString()
+  @ApiProperty()
   email: string;
 
-  @IsString()
+  @ApiProperty()
   phone: string;
 
-  @IsString()
+  @ApiProperty()
   lastName: string;
 
-  @IsString()
+  @ApiProperty()
   firstName: string;
 
-  @IsString()
+  @ApiProperty()
   password: string;
 }
 
 export class UserValidateDto {
-  @IsString()
+  @ApiProperty()
   uid: string;
 
-  @IsString()
+  @ApiProperty()
   token: string;
+}
+
+export class ChangePassDto {
+  @ApiProperty()
+  uid: string;
+
+  @ApiProperty()
+  password: string;
+
+  @ApiProperty()
+  old_password: string;
+}
+
+export class UpdateUserDto {
+  @ApiProperty()
+  first_name: string;
+
+  @ApiProperty()
+  last_name: string;
+}
+
+export class PayloadDto {
+  @IsString()
+  password?: string;
+
+  @IsString()
+  username: string;
+
+  @IsString()
+  uid: string;
 }

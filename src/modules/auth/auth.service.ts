@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { compare } from 'bcrypt';
@@ -6,12 +11,12 @@ import { I18nService } from 'nestjs-i18n';
 import { Repository } from 'typeorm';
 import { Profile } from '../../entities/profile';
 import { User } from '../../entities/user';
-import { RegisterDto } from './auth.dto';
+import { RegisterDto, UserSignInDto } from './auth.dto';
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User)
-    private usersRepository: Repository<User>,
+    private userRepository: Repository<User>,
 
     @InjectRepository(Profile)
     private profileRepository: Repository<Profile>,
@@ -20,11 +25,15 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signUp(
-    { firstName, lastName, email, phone, username, password }: RegisterDto,
-    lang?: string,
-  ): Promise<any> {
-    const checkExistUser = await this.usersRepository.findOne({
+  async signUp({
+    firstName,
+    lastName,
+    email,
+    phone,
+    username,
+    password,
+  }: RegisterDto): Promise<any> {
+    const checkExistUser = await this.userRepository.findOne({
       username,
     });
     const emailProfile = await this.profileRepository.findOne({ email });
@@ -32,8 +41,8 @@ export class AuthService {
     if (checkExistUser) {
       throw new HttpException(
         {
-          message: await this.i18n.translate('global.USERNAME_DUPLICATE', {
-            lang: lang,
+          message: await this.i18n.translate('user.USERNAME_DUPLICATE', {
+            lang: 'en',
           }),
         },
         HttpStatus.BAD_REQUEST,
@@ -43,8 +52,8 @@ export class AuthService {
     if (emailProfile) {
       throw new HttpException(
         {
-          message: await this.i18n.translate('global.EMAIL_INVALID', {
-            lang: lang,
+          message: await this.i18n.translate('user.EMAIL_INVALID', {
+            lang: 'en',
           }),
         },
         HttpStatus.BAD_REQUEST,
@@ -63,38 +72,30 @@ export class AuthService {
 
     user.password = password;
     user.profile = profile;
-    const result = await this.usersRepository.save(user);
+    const result = await this.userRepository.save(user);
 
     return {
       ...result,
     };
   }
 
-  async validateToken(uid: any, token: string, lang?: string) {
-    const payload = { uid, token };
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
-  }
-
   async validateUser(username: string, password: string): Promise<any> {
-    const user = await this.usersRepository.findOne(
+    const user: User = await this.userRepository.findOne(
       {
         username,
       },
-      {
-        relations: ['profile'],
-      },
+      { relations: ['profile'] },
     );
-
-    console.log(user);
 
     if (!user) {
       throw new HttpException(
         {
-          message: await this.i18n.translate('global.USER_INVALID', {
-            lang: 'en',
-          }),
+          message: await this.i18n.translate(
+            'user.USERNAME_OR_PASSWORD_ERROR',
+            {
+              lang: 'en',
+            },
+          ),
         },
         HttpStatus.BAD_REQUEST,
       );
@@ -104,21 +105,48 @@ export class AuthService {
       if (!comparPw) {
         throw new HttpException(
           {
-            message: await this.i18n.translate('global.USER_INVALID', {
-              lang: 'en',
-            }),
+            message: await this.i18n.translate(
+              'user.USERNAME_OR_PASSWORD_ERROR',
+              {
+                lang: 'en',
+              },
+            ),
           },
           HttpStatus.BAD_REQUEST,
         );
       }
 
-      const response = {
-        ...user.profile,
-      };
-
-      delete response.id;
-
-      return response;
+      return user;
     }
+  }
+
+  async changePass(uid: string, password: string): Promise<any> {
+    const user = this.userRepository.findOne(uid);
+    if (!user) {
+      throw new HttpException(
+        {
+          message: await this.i18n.translate('global.GET_TOKEN_FAIL', {
+            lang: 'en',
+          }),
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    } else {
+      return await this.userRepository.update({ id: uid }, { password });
+    }
+  }
+
+  async login({ username, password }: UserSignInDto) {
+    const user = await this.validateUser(username, password);
+    console.log(user);
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+
+    return {
+      access_token: this.jwtService.sign({ username, password, uid: user.id }),
+      uid: user.id,
+      pid: user.profile.id,
+    };
   }
 }

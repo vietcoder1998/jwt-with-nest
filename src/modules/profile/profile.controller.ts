@@ -1,9 +1,12 @@
-import { Controller, Get, Headers, Request, UseGuards } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
+import { Controller, Get, Headers, Param, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
 import { I18nService } from 'nestjs-i18n';
-import { LoggerService } from '../../logger/index';
-import { ProfileService } from './profile.service';
+import { LoggerService } from 'src/logger/index';
+import { JwtAuthGuard } from 'src/modules/auth/jwt-auth.guard';
+import { ProfileService } from 'src/modules/profile/profile.service';
 
+@ApiBearerAuth('defaultBearerAuth')
+@ApiTags('Profile')
 @Controller('profile')
 export class ProfileController {
   private logger: LoggerService = new LoggerService();
@@ -13,15 +16,16 @@ export class ProfileController {
     private i18n: I18nService,
   ) {}
 
-  @UseGuards(JwtModule)
-  @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiParam({
+    name: 'pid',
+    description: 'profile id',
+  })
+  @Get('/:pid')
   async profile(
-    @Headers('Authorization') authToken: string,
     @Headers('x-lang') lang: string,
-    @Request() req,
+    @Param('pid') pid: string,
   ): Promise<any> {
-    const profileInfo = req.profile;
-
-    return await this.profileService.findOne(profileInfo, lang);
+    return await this.profileService.findOne(pid, lang);
   }
 }

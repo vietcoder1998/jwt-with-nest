@@ -4,18 +4,19 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { I18nService } from 'nestjs-i18n';
 import { Like, Repository } from 'typeorm';
 import { User } from '../../entities/user';
+import { isEmpty } from 'class-validator';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
-    private usersRepository: Repository<User>,
+    private userRepository: Repository<User>,
 
     private i18n: I18nService,
   ) {}
 
   async findOne(uid: string, lang?: string): Promise<any> {
-    const user = await this.usersRepository.findOne({
+    const user = await this.userRepository.findOne({
       id: uid,
     });
 
@@ -34,27 +35,17 @@ export class UserService {
   }
 
   async find(skip: number, take: number, username: string) {
-    const result = this.usersRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.profile', 'profile')
-      .skip((skip ?? 0) * (take ?? 10))
-      .take(take)
-      .execute();
+    const result = await this.userRepository.find({
+      relations: ['profile'],
+      skip: (skip ?? 0) * (take ?? 10),
+      take: take ?? 10,
+    });
 
-    return result;
-  }
+    const response = result.map((item) => ({
+      id: item.id,
+      username: item.username,
+    }));
 
-  async changePass(uid: string, password: string, lang: string): Promise<any> {
-    const user = this.usersRepository.findOne(uid);
-    if (!user) {
-      throw new HttpException(
-        {
-          message: await this.i18n.translate('global.GET_TOKEN_FAIL', {
-            lang: lang,
-          }),
-        },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    return response;
   }
 }

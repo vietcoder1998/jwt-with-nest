@@ -1,13 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Http } from '../../helpers/http';
-
+import { Http } from 'src/helpers/http';
 import { InjectRepository } from '@nestjs/typeorm';
-import axios from 'axios';
 import { I18nService } from 'nestjs-i18n';
+import { Profile } from 'src/entities/profile';
+import { Utils } from 'src/helpers/utils';
 import { Repository } from 'typeorm';
-import { Profile } from '../../entities/profile';
-import { Utils } from '../../helpers/utils';
-import { UpdateProfileDto } from './profile.dto';
 
 @Injectable()
 export class ProfileService {
@@ -18,9 +15,10 @@ export class ProfileService {
     private i18n: I18nService,
   ) {}
 
-  async findOne(uid: string, lang?: string): Promise<any> {
+  async findOne(pid: string, lang?: string): Promise<any> {
+    console.log(pid);
     const profile = await this.profilesRepository.findOne({
-      id: uid,
+      id: pid,
     });
 
     if (!profile) {
