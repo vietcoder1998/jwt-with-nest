@@ -18,6 +18,9 @@ export class Profile {
   @Column({ default: '' })
   last_name: string;
 
+  @Column({ default: '' })
+  full_name: string;
+
   @Column()
   phone?: string;
 

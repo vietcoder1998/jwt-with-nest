@@ -1,6 +1,5 @@
 import { Controller, Get, Headers, Param, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
-import { I18nService } from 'nestjs-i18n';
 import { LoggerService } from '../logger/index';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ProfileService } from './profile.service';
@@ -11,10 +10,7 @@ import { ProfileService } from './profile.service';
 export class ProfileController {
   private logger: LoggerService = new LoggerService();
 
-  constructor(
-    private profileService: ProfileService,
-    private i18n: I18nService,
-  ) {}
+  constructor(private profileService: ProfileService) {}
 
   @UseGuards(JwtAuthGuard)
   @ApiParam({

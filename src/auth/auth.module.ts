@@ -20,7 +20,7 @@ import { LocalStrategy } from './local.strategy';
       signOptions: { expiresIn: '1d' },
     }),
   ],
-  exports: [TypeOrmModule, AuthService],
+  exports: [TypeOrmModule, AuthService, UserService, AuthService],
   controllers: [AuthController],
   providers: [AuthService, UserService, LocalStrategy, JwtStrategy],
 })

@@ -1,141 +1,116 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { JwtService } from '@nestjs/jwt';
+import { Test } from '@nestjs/testing';
+import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
+import { getRepository, Repository } from 'typeorm';
+import { ConfigModule } from '../config/config.module';
+import { ConfigService } from '../config/config.service';
+import { Profile } from '../entities/profile';
+import { User } from '../entities/user';
+import { UserService } from '../user/user.service';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { faker } from '@faker-js/faker';
 
 describe('AuthController', () => {
   let authController: AuthController;
   let authService: AuthService;
-  let moduleRef: TestingModule;
+  const configService = new ConfigService();
 
   beforeAll(async () => {
-    moduleRef = await Test.createTestingModule({
+    await Test.createTestingModule({
+      imports: [
+        ConfigModule.register({ folder: './config' }),
+        TypeOrmModule.forRoot({
+          type: 'mysql',
+          name: 'default',
+          host: configService.get('DB_HOST'),
+          port: parseInt(configService.get('DB_PORT')),
+          username: configService.get('DB_USER'),
+          password: configService.get('DB_PASS'),
+          database: configService.get('DB_NAME'),
+          entities: [User, Profile],
+          synchronize: true,
+          logging: false,
+        }),
+      ],
       controllers: [AuthController],
-      providers: [AuthService],
+      providers: [
+        AuthService,
+        UserService,
+        JwtService,
+        {
+          provide: getRepositoryToken(User),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(Profile),
+          useClass: Repository,
+        },
+      ],
     }).compile();
 
     // service = app.get(SftpService); // In that case I got the same error as in main test
   });
 
   beforeEach(async () => {
-    authController = moduleRef.get<AuthController>(AuthController);
-    authService = moduleRef.get<AuthService>(AuthService);
+    const userRepository = getRepository(User);
+    const profileRepository = getRepository(Profile);
+    const jwtService = new JwtService();
+    authService = new AuthService(
+      userRepository,
+      profileRepository,
+      jwtService,
+    );
+    authController = new AuthController(authService);
   });
 
-  describe('SignIn', () => {
-    describe('With True Account', () => {
-      it('Error in login', async () => {
-        let result;
+  describe('Sign In', () => {
+    it('Success in sign in', async () => {
+      let result;
 
-        jest
-          .spyOn(authService, 'login')
-          .mockImplementation(({ username, password }) => result);
-
-        expect(await authController.signIn).toBe(result);
-      });
+      jest.spyOn(authService, 'login').mockImplementation(() => result);
+      expect(
+        await authController.signIn({
+          username: 'hello_world',
+          password: '1234567',
+        }),
+      ).toBe(result);
     });
-
-    // describe('with Error UserName', () => {
-    //   it('Error in login', async () => {
-    //     const signInAction = jest.spyOn(authController, 'signIn');
-    //     const signIn = authController.signIn({
-    //       username: 'hello_world',
-    //       password: '1234567',
-    //     });
-
-    //     expect(signInAction).toHaveProperty(['access_token', 'pid', 'uid']);
-    //     expect(signIn).toBe(true);
-
-    //     signInAction.mockReset();
-    //     signInAction.mockRestore();
-    //   });
-    // });
-
-    // describe('with Error Password', () => {
-    //   it('Error in login', async () => {
-    //     let result;
-
-    //     jest
-    //       .spyOn(authController, 'signIn')
-    //       .mockImplementation(({ username, password }) => result);
-
-    //     expect(await authController.signIn).toBe(result);
-    //   });
-    // });
   });
 
-  // describe('SignUp', () => {
-  //   describe('', () => {
-  //     it('Error in login', async () => {
-  //       let result;
+  describe('Sign Up', () => {
+    it('Success in sign up', async () => {
+      let result;
 
-  //       jest
-  //         .spyOn(authController, 'signIn')
-  //         .mockImplementation(({ username, password }) => result);
+      jest.spyOn(authService, 'signUp').mockImplementation(() => result);
+      expect(
+        await authController.signUp({
+          username: faker.internet.userName(),
+          password: faker.internet.password(),
+          firstName: faker.name.firstName(),
+          lastName: faker.name.lastName(),
+          email: faker.internet.email(),
+          phone: faker.phone.number(),
+        }),
+      ).toBe(result);
+    });
+  });
 
-  //       expect(await authController.signIn).toBe(result);
-  //     });
-  //   });
+  describe('Change password', () => {
+    it('Success in change pass', async () => {
+      let result;
+      const password = faker.internet.password();
+      const old_password = password;
+      const id = '18';
 
-  //   describe('login', () => {
-  //     it('Error in login', async () => {
-  //       let result;
-
-  //       jest
-  //         .spyOn(authController, 'signIn')
-  //         .mockImplementation(({ username, password }) => result);
-
-  //       expect(await authController.signIn).toBe(result);
-  //     });
-  //   });
-
-  //   describe('login', () => {
-  //     it('Error in login', async () => {
-  //       let result;
-
-  //       jest
-  //         .spyOn(authController, 'signIn')
-  //         .mockImplementation(({ username, password }) => result);
-
-  //       expect(await authController.signIn).toBe(result);
-  //     });
-  //   });
-  // });
-
-  // describe('ChangePass', () => {
-  //   describe('', () => {
-  //     it('Error in login', async () => {
-  //       let result;
-
-  //       jest
-  //         .spyOn(authController, 'signIn')
-  //         .mockImplementation(({ username, password }) => result);
-
-  //       expect(await authController.signIn).toBe(result);
-  //     });
-  //   });
-
-  //   describe('login', () => {
-  //     it('Error in login', async () => {
-  //       let result;
-
-  //       jest
-  //         .spyOn(authController, 'signIn')
-  //         .mockImplementation(({ username, password }) => result);
-
-  //       expect(await authController.signIn).toBe(result);
-  //     });
-  //   });
-
-  //   describe('login', () => {
-  //     it('Error in login', async () => {
-  //       let result;
-
-  //       jest
-  //         .spyOn(authController, 'signIn')
-  //         .mockImplementation(({ username, password }) => result);
-
-  //       expect(await authController.signIn).toBe(result);
-  //     });
-  //   });
-  // });
+      jest.spyOn(authService, 'signUp').mockImplementation(() => result);
+      expect(
+        await authController.changePass({
+          password,
+          old_password,
+          uid: id,
+        }),
+      ).toBe(undefined);
+    });
+  });
 });

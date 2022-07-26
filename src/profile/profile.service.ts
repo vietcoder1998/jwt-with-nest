@@ -1,8 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Http } from 'src/helpers/http';
 import { InjectRepository } from '@nestjs/typeorm';
-import { I18nService } from 'nestjs-i18n';
 import { Profile } from 'src/entities/profile';
+import { Http } from 'src/helpers/http';
 import { Utils } from 'src/helpers/utils';
 import { Repository } from 'typeorm';
 
@@ -11,8 +10,6 @@ export class ProfileService {
   constructor(
     @InjectRepository(Profile)
     private profilesRepository: Repository<Profile>,
-
-    private i18n: I18nService,
   ) {}
 
   async findOne(pid: string, lang?: string): Promise<any> {
@@ -24,9 +21,7 @@ export class ProfileService {
     if (!profile) {
       throw new HttpException(
         {
-          message: await this.i18n.translate('profile.USER_NOTFOUND', {
-            lang: lang,
-          }),
+          message: 'USER_NOTFOUND',
         },
         HttpStatus.BAD_REQUEST,
       );
@@ -40,9 +35,7 @@ export class ProfileService {
     if (Utils.isEmpty(uid)) {
       throw new HttpException(
         {
-          message: await this.i18n.translate('global.EMAIL_EMPTY', {
-            lang: lang,
-          }),
+          message: 'EMAIL_EMPTY',
         },
         HttpStatus.BAD_REQUEST,
       );
@@ -51,9 +44,7 @@ export class ProfileService {
     if (!Utils.validateEmail(email)) {
       throw new HttpException(
         {
-          message: await this.i18n.translate('global.EMAIL_NOT_VALID', {
-            lang: lang,
-          }),
+          message: 'EMAIL_NOT_VALID',
         },
         HttpStatus.BAD_REQUEST,
       );
@@ -67,9 +58,7 @@ export class ProfileService {
     if (checkExist) {
       throw new HttpException(
         {
-          message: await this.i18n.translate('global.EMAIL_EXISTS', {
-            lang: lang,
-          }),
+          message: 'EMAIL_EXISTS',
         },
         HttpStatus.BAD_REQUEST,
       );
@@ -82,9 +71,7 @@ export class ProfileService {
     if (!profile) {
       throw new HttpException(
         {
-          message: await this.i18n.translate('global.EMAIL_EXISTS', {
-            lang: lang,
-          }),
+          message: 'EMAIL_EXISTS',
         },
         HttpStatus.BAD_REQUEST,
       );
@@ -92,16 +79,12 @@ export class ProfileService {
       const result = await this.profilesRepository.update(uid, { email });
 
       if (result) {
-        return Http.responseMessage(
-          await this.i18n.translate('global.UPDATE_SUCCESS', { lang: lang }),
-        );
+        return Http.responseMessage('UPDATE_SUCCESS');
       } else {
         //return Http.responseError('Error update info.');
         throw new HttpException(
           {
-            message: await this.i18n.translate('global.UPDATE_INFO_FAIL', {
-              lang: lang,
-            }),
+            message: 'UPDATE_INFO_FAIL',
           },
           HttpStatus.BAD_REQUEST,
         );

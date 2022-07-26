@@ -1,21 +1,17 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
-import { I18nService } from 'nestjs-i18n';
-import { Like, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { User } from '../entities/user';
-import { isEmpty } from 'class-validator';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
-
-    private i18n: I18nService,
   ) {}
 
-  async findOne(uid: string, lang?: string): Promise<any> {
+  async findOne(uid: string): Promise<any> {
     const user = await this.userRepository.findOne({
       id: uid,
     });
@@ -23,9 +19,7 @@ export class UserService {
     if (!user) {
       throw new HttpException(
         {
-          message: await this.i18n.translate('user.USER_NOTFOUND', {
-            lang: lang,
-          }),
+          message: 'USER_NOTFOUND',
         },
         HttpStatus.BAD_REQUEST,
       );

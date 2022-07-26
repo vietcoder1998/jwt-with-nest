@@ -7,7 +7,6 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { compare } from 'bcrypt';
-import { I18nService } from 'nestjs-i18n';
 import { Repository } from 'typeorm';
 import { Profile } from '../entities/profile';
 import { User } from '../entities/user';
@@ -21,7 +20,6 @@ export class AuthService {
     @InjectRepository(Profile)
     private profileRepository: Repository<Profile>,
 
-    private readonly i18n: I18nService,
     private jwtService: JwtService,
   ) {}
 
@@ -41,9 +39,7 @@ export class AuthService {
     if (checkExistUser) {
       throw new HttpException(
         {
-          message: await this.i18n.translate('user.USERNAME_DUPLICATE', {
-            lang: 'en',
-          }),
+          message: 'USERNAME_DUPLICATE',
         },
         HttpStatus.BAD_REQUEST,
       );
@@ -52,9 +48,7 @@ export class AuthService {
     if (emailProfile) {
       throw new HttpException(
         {
-          message: await this.i18n.translate('user.EMAIL_INVALID', {
-            lang: 'en',
-          }),
+          message: 'USERNAME_DUPLICATE',
         },
         HttpStatus.BAD_REQUEST,
       );
@@ -65,6 +59,7 @@ export class AuthService {
       email,
       first_name: firstName,
       last_name: lastName,
+      full_name: [firstName, lastName].join(' '),
     });
 
     const user = new User();
@@ -90,12 +85,7 @@ export class AuthService {
     if (!user) {
       throw new HttpException(
         {
-          message: await this.i18n.translate(
-            'user.USERNAME_OR_PASSWORD_ERROR',
-            {
-              lang: 'en',
-            },
-          ),
+          message: 'USERNAME_OR_PASSWORD_ERROR',
         },
         HttpStatus.BAD_REQUEST,
       );
@@ -105,12 +95,7 @@ export class AuthService {
       if (!comparPw) {
         throw new HttpException(
           {
-            message: await this.i18n.translate(
-              'user.USERNAME_OR_PASSWORD_ERROR',
-              {
-                lang: 'en',
-              },
-            ),
+            message: 'USERNAME_OR_PASSWORD_ERROR',
           },
           HttpStatus.BAD_REQUEST,
         );
@@ -125,9 +110,7 @@ export class AuthService {
     if (!user) {
       throw new HttpException(
         {
-          message: await this.i18n.translate('global.GET_TOKEN_FAIL', {
-            lang: 'en',
-          }),
+          message: 'GET_TOKEN_FAIL',
         },
         HttpStatus.BAD_REQUEST,
       );
