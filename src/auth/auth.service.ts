@@ -9,8 +9,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { compare } from 'bcrypt';
 import { I18nService } from 'nestjs-i18n';
 import { Repository } from 'typeorm';
-import { Profile } from '../../entities/profile';
-import { User } from '../../entities/user';
+import { Profile } from '../entities/profile';
+import { User } from '../entities/user';
 import { RegisterDto, UserSignInDto } from './auth.dto';
 @Injectable()
 export class AuthService {

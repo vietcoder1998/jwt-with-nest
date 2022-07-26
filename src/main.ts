@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+require('dotenv').config();
+
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { PassportModule } from '@nestjs/passport';
@@ -8,11 +11,10 @@ import { middleware } from './app.middleware';
 import { AppModule } from './app.module';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-require('dotenv').config();
-
-PassportModule.register({ session: true });
 
 async function bootstrap(): Promise<void> {
+  PassportModule.register({ session: true });
+
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     bufferLogs: false,
   });

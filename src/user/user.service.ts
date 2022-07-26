@@ -3,7 +3,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { I18nService } from 'nestjs-i18n';
 import { Like, Repository } from 'typeorm';
-import { User } from '../../entities/user';
+import { User } from '../entities/user';
 import { isEmpty } from 'class-validator';
 
 @Injectable()

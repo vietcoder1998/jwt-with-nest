@@ -5,23 +5,19 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { FcmModule } from 'nestjs-fcm';
 import { HeaderResolver, I18nJsonParser, I18nModule } from 'nestjs-i18n';
 import * as path from 'path';
-import { AuthenticationMiddleware } from './modules/auth/auth.middleware';
+import { AuthenticationMiddleware } from './auth/auth.middleware';
 import { Profile } from './entities/profile';
 import { User } from './entities/user';
 import { AllExceptionFilter } from './filter/exception.filter';
 import { LoggerMiddleware } from './logger.middleware';
-import { AuthModule } from './modules/auth/auth.module';
-import { ProfileModule } from './modules/profile/profile.module';
-import { UserModule } from './modules/user/user.module';
+import { AuthModule } from './auth/auth.module';
+import { ProfileModule } from './profile/profile.module';
+import { UserModule } from './user/user.module';
+import { ConfigModule } from './config/config.module';
 
 @Module({
-  providers: [
-    {
-      provide: APP_FILTER,
-      useClass: AllExceptionFilter,
-    },
-  ],
   imports: [
+    ConfigModule.register({ folder: './config' }),
     I18nModule.forRoot({
       fallbackLanguage: 'en',
       fallbacks: {
@@ -43,6 +39,7 @@ import { UserModule } from './modules/user/user.module';
     /// mysql connect
     TypeOrmModule.forRoot({
       type: 'mysql',
+      name: 'default',
       host: process.env.DB_HOST,
       port: parseInt(process.env.DB_PORT),
       username: process.env.DB_USER,
@@ -55,6 +52,13 @@ import { UserModule } from './modules/user/user.module';
     AuthModule,
     UserModule,
     ProfileModule,
+  ],
+  exports: [I18nModule],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionFilter,
+    },
   ],
 })
 export class AppModule {

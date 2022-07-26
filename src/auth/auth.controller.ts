@@ -7,18 +7,13 @@ import {
   SetMetadata,
   UseGuards,
 } from '@nestjs/common';
-import { JwtModule, JwtService } from '@nestjs/jwt';
+import { JwtModule } from '@nestjs/jwt';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { genSaltSync, hash } from 'bcrypt';
 import { isEmpty } from 'class-validator';
-import { I18nService } from 'nestjs-i18n';
-import {
-  ChangePassDto,
-  RegisterDto,
-  UserSignInDto,
-} from 'src/modules/auth/auth.dto';
-import { AuthService } from 'src/modules/auth/auth.service';
-import { LocalAuthGuard } from 'src/modules/auth/local-auth.guard';
+import { ChangePassDto, RegisterDto, UserSignInDto } from './auth.dto';
+import { AuthService } from './auth.service';
+import { LocalAuthGuard } from './local-auth.guard';
 
 export const IS_PUBLIC_KEY = 'SkipAuth';
 export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
@@ -26,7 +21,7 @@ export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
 @Controller('auth')
 @ApiTags('Authenticate')
 export class AuthController {
-  constructor(private authService: AuthService, private i18n: I18nService) {}
+  constructor(private authService: AuthService) {}
 
   @ApiBody({
     schema: {
@@ -76,9 +71,7 @@ export class AuthController {
     if (isEmpty(password) || password.length < 5 || password !== old_password) {
       throw new HttpException(
         {
-          message: await this.i18n.translate('global.PASSWORD_ERROR', {
-            lang: 'en',
-          }),
+          message: 'PASSWORD_ERROR',
         },
         HttpStatus.BAD_REQUEST,
       );
@@ -87,9 +80,7 @@ export class AuthController {
     if (password.length < 5) {
       throw new HttpException(
         {
-          message: await this.i18n.translate('global.MINIMUM_LENGTH_PASSWORD', {
-            lang: 'en',
-          }),
+          message: 'MINIMUM_LENGTH_PASSWORD',
         },
         HttpStatus.BAD_REQUEST,
       );

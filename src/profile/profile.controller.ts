@@ -1,9 +1,9 @@
 import { Controller, Get, Headers, Param, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
 import { I18nService } from 'nestjs-i18n';
-import { LoggerService } from 'src/logger/index';
-import { JwtAuthGuard } from 'src/modules/auth/jwt-auth.guard';
-import { ProfileService } from 'src/modules/profile/profile.service';
+import { LoggerService } from '../logger/index';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { ProfileService } from './profile.service';
 
 @ApiBearerAuth('defaultBearerAuth')
 @ApiTags('Profile')
