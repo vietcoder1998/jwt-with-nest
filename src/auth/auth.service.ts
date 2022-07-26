@@ -24,6 +24,20 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
+  async login({ username, password }: UserSignInDto) {
+    const user = await this.validateUser(username, password);
+    console.log(user);
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+
+    return {
+      access_token: this.jwtService.sign({ username, password, uid: user.id }),
+      uid: user.id,
+      pid: user.profile.id,
+    };
+  }
+
   async signUp({
     firstName,
     lastName,
@@ -107,7 +121,10 @@ export class AuthService {
   }
 
   async changePass(uid: string, password: string): Promise<any> {
-    const user = await this.userRepository.findOne(uid);
+    console.log(uid);
+    const user = await this.userRepository.findOne({ id: uid });
+
+    console.log(user);
 
     if (!user) {
       throw new HttpException(
@@ -118,7 +135,7 @@ export class AuthService {
       );
     }
 
-    const result = await this.userRepository.save({ password });
+    const result = await this.userRepository.update(uid, { password });
     if (result) {
       return Http.responseMessage('UPDATE_SUCCESS');
     } else {
@@ -129,19 +146,5 @@ export class AuthService {
         HttpStatus.BAD_REQUEST,
       );
     }
-  }
-
-  async login({ username, password }: UserSignInDto) {
-    const user = await this.validateUser(username, password);
-    console.log(user);
-    if (!user) {
-      throw new UnauthorizedException();
-    }
-
-    return {
-      access_token: this.jwtService.sign({ username, password, uid: user.id }),
-      uid: user.id,
-      pid: user.profile.id,
-    };
   }
 }

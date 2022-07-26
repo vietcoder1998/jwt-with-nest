@@ -87,8 +87,6 @@ export class AuthController {
 
     const hashPass = await hash(password, 10);
 
-    console.log(hashPass);
-
     return await this.authService.changePass(uid, hashPass);
   }
 }

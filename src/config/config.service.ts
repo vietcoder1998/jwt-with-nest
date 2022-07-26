@@ -11,10 +11,7 @@ export class ConfigService {
   constructor() {
     const options = { folder: './config' };
     const filePath = `.${process.env.NODE_ENV || 'development'}.env`;
-    console.log(filePath);
     const envFile = resolve(__dirname, '../../', options.folder, filePath);
-    console.log(envFile);
-
     this.envConfig = dotenv.parse(fs.readFileSync(envFile));
   }
 

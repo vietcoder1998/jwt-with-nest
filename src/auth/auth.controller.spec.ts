@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { JwtService } from '@nestjs/jwt';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 import { getRepository, getConnection } from 'typeorm';
 import { Profile } from '../entities/profile';
 import { User } from '../entities/user';
@@ -11,19 +11,21 @@ import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '../config/config.module';
 import { UserService } from '../user/user.service';
 import { Repository } from 'typeorm';
+import { jwtConstants } from './constants';
 
 describe('AuthController', () => {
   let authController: AuthController;
   let authService: AuthService;
+  let jwtService = new JwtService();
+  const configService = new ConfigService();
 
-  beforeAll(async () => {
-    const configService = new ConfigService();
+  beforeEach(async () => {
     await Test.createTestingModule({
       imports: [
         ConfigModule.register({ folder: './config' }),
         TypeOrmModule.forRoot({
           type: 'mysql',
-          name: 'test',
+          name: configService.get('CONNECTION_NAME'),
           host: configService.get('DB_HOST'),
           port: parseInt(configService.get('DB_PORT')),
           username: configService.get('DB_USER'),
@@ -33,6 +35,10 @@ describe('AuthController', () => {
           synchronize: true,
           logging: false,
         }),
+        JwtModule.register({
+          secret: jwtConstants.secret,
+          signOptions: { expiresIn: '1d' },
+        }),
       ],
       controllers: [AuthController],
       providers: [
@@ -40,19 +46,25 @@ describe('AuthController', () => {
         UserService,
         JwtService,
         {
-          provide: getRepositoryToken(User, 'test'),
+          provide: getRepositoryToken(User),
           useClass: Repository,
         },
         {
-          provide: getRepositoryToken(Profile, 'test'),
+          provide: getRepositoryToken(Profile),
           useClass: Repository,
         },
       ],
     }).compile();
 
-    const userRepository = getRepository(User);
-    const profileRepository = getRepository(Profile);
-    const jwtService = new JwtService();
+    const userRepository = getRepository(
+      User,
+      configService.get('CONNECTION_NAME'),
+    );
+    const profileRepository = getRepository(
+      Profile,
+      configService.get('CONNECTION_NAME'),
+    );
+    jwtService = new JwtService();
     authService = new AuthService(
       userRepository,
       profileRepository,
@@ -61,9 +73,9 @@ describe('AuthController', () => {
     authController = new AuthController(authService);
   });
 
-  afterAll(async () => {
-    getConnection('default').close()
-  })
+  afterEach(async () => {
+    await getConnection(configService.get('CONNECTION_NAME')).close();
+  });
 
   describe('Sign In', () => {
     it('Success in sign in', async () => {
@@ -102,17 +114,16 @@ describe('AuthController', () => {
       let result;
       const password = faker.internet.password();
       const old_password = password;
-      const id = '18';
+      const id = '9';
 
-      jest.spyOn(authService, 'signUp').mockImplementation(() => result);
+      jest.spyOn(authService, 'changePass').mockImplementation(() => result);
       expect(
         await authController.changePass({
           password,
           old_password,
           uid: id,
         }),
-      ).toBe(undefined);
+      ).toBe(result);
     });
   });
-
 });

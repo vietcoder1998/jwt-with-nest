@@ -8,8 +8,6 @@ import { ProfileService } from './profile.service';
 @ApiTags('Profile')
 @Controller('profile')
 export class ProfileController {
-  private logger: LoggerService = new LoggerService();
-
   constructor(private profileService: ProfileService) {}
 
   @UseGuards(JwtAuthGuard)
@@ -18,10 +16,7 @@ export class ProfileController {
     description: 'profile id',
   })
   @Get('/:pid')
-  async profile(
-    @Headers('x-lang') lang: string,
-    @Param('pid') pid: string,
-  ): Promise<any> {
-    return await this.profileService.findOne(pid, lang);
+  async profile(@Param('pid') pid: string): Promise<any> {
+    return await this.profileService.findOne(pid);
   }
 }

@@ -8,13 +8,13 @@ import { ConfigModule } from '../config/config.module';
 import { ConfigService } from '../config/config.service';
 import { Profile } from '../entities/profile';
 import { User } from '../entities/user';
-import { UserController } from './user.controller';
-import { UserService } from './user.service';
+import { ProfileController } from './profile.controller';
+import { ProfileService } from './profile.service';
 import { jwtConstants } from '../auth/constants';
 
-describe('UserController', () => {
-  let userService: UserService;
-  let userController: UserController;
+describe('ProfileController', () => {
+  let profileService: ProfileService;
+  let profileController: ProfileController;
   const configService = new ConfigService();
 
   beforeEach(async () => {
@@ -41,42 +41,38 @@ describe('UserController', () => {
       controllers: [AuthController],
       providers: [
         AuthService,
-        UserService,
+        ProfileService,
         JwtService,
         {
-          provide: getRepositoryToken(User),
+          provide: getRepositoryToken(Profile),
           useClass: Repository,
         },
         {
-          provide: getRepositoryToken(Profile),
+          provide: getRepositoryToken(User),
           useClass: Repository,
         },
       ],
     }).compile();
 
-    const userRepository = getRepository(
-      User,
+    const profileRepository = getRepository(
+      Profile,
       configService.get('CONNECTION_NAME'),
     );
-    userService = new UserService(userRepository);
-    userController = new UserController(userService);
+    profileService = new ProfileService(profileRepository);
+    profileController = new ProfileController(profileService);
   });
 
   afterEach(async () => {
     await getConnection(configService.get('CONNECTION_NAME')).close();
   });
 
-  describe('Find User', () => {
-    it('Find User Success', async () => {
+  describe('Find Profile', () => {
+    it('Find Profile', async () => {
       let result;
+      const pid = '15';
 
-      jest.spyOn(userService, 'find').mockImplementation(() => result);
-      expect(
-        await userController.find({
-          skip: 0,
-          take: 10,
-        }),
-      ).toBe(result);
+      jest.spyOn(profileController, 'profile').mockImplementation(() => result);
+      expect(await profileController.profile(pid)).toBe(result);
     });
   });
 });
