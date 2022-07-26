@@ -29,33 +29,45 @@
 ## Installation
 
 ```bash
-$ npm install
+$ yarn install
 ```
+
+## Requirement 
+
+- MySQL
+- Create Table
+- In ./config add file .development.env, .test.env, .production.env
+- Example: 
+  DB_USER=root
+  DB_PASS=Anh123456./
+  DB_HOST=localhost
+  DB_PORT=3306
+  DB_NAME=test_product
 
 ## Running the app
 
 ```bash
 # development
-$ npm run start
+$ yarn start
 
 # watch mode
-$ npm run start:dev
+$ yarn start:dev
 
 # production mode
-$ npm run start:prod
+$ yarn start:prod
 ```
 
 ## Test
 
 ```bash
 # unit tests
-$ npm run test
+$ yarn test
 
 # e2e tests
-$ npm run test:e2e
+$ yarn test:e2e
 
 # test coverage
-$ npm run test:cov
+$ yarn test:cov
 ```
 
 ## Support
