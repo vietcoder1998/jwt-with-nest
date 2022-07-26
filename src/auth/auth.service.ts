@@ -7,6 +7,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { compare } from 'bcrypt';
+import { Http } from '../helpers/http';
 import { Repository } from 'typeorm';
 import { Profile } from '../entities/profile';
 import { User } from '../entities/user';
@@ -106,7 +107,8 @@ export class AuthService {
   }
 
   async changePass(uid: string, password: string): Promise<any> {
-    const user = this.userRepository.findOne(uid);
+    const user = await this.userRepository.findOne(uid);
+
     if (!user) {
       throw new HttpException(
         {
@@ -114,8 +116,18 @@ export class AuthService {
         },
         HttpStatus.BAD_REQUEST,
       );
+    }
+
+    const result = await this.userRepository.save({ password });
+    if (result) {
+      return Http.responseMessage('UPDATE_SUCCESS');
     } else {
-      return await this.userRepository.update({ id: uid }, { password });
+      throw new HttpException(
+        {
+          message: 'UPDATE_PASS_ERROR',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 

@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
-import { genSaltSync, hash } from 'bcrypt';
+import { hash } from 'bcrypt';
 import { isEmpty } from 'class-validator';
 import { ChangePassDto, RegisterDto, UserSignInDto } from './auth.dto';
 import { AuthService } from './auth.service';
@@ -42,16 +42,15 @@ export class AuthController {
     @Body()
     { username, password, firstName, lastName, email, phone }: RegisterDto,
   ) {
-    return await hash(password, await genSaltSync(10, 'a')).then(
-      async (hashPass) =>
-        this.authService.signUp({
-          username,
-          password: hashPass,
-          firstName,
-          lastName,
-          email,
-          phone,
-        }),
+    return await hash(password, 10).then(async (hashPass) =>
+      this.authService.signUp({
+        username,
+        password: hashPass,
+        firstName,
+        lastName,
+        email,
+        phone,
+      }),
     );
   }
 
@@ -86,8 +85,10 @@ export class AuthController {
       );
     }
 
-    return await hash(password, await genSaltSync(10, 'a')).then(
-      async (hashPass) => this.authService.changePass(uid, hashPass),
-    );
+    const hashPass = await hash(password, 10);
+
+    console.log(hashPass);
+
+    return await this.authService.changePass(uid, hashPass);
   }
 }

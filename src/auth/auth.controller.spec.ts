@@ -1,28 +1,29 @@
+import { faker } from '@faker-js/faker';
 import { JwtService } from '@nestjs/jwt';
-import { Test } from '@nestjs/testing';
-import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
-import { getRepository, Repository } from 'typeorm';
-import { ConfigModule } from '../config/config.module';
-import { ConfigService } from '../config/config.service';
+import { getRepository, getConnection } from 'typeorm';
 import { Profile } from '../entities/profile';
 import { User } from '../entities/user';
-import { UserService } from '../user/user.service';
 import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
-import { faker } from '@faker-js/faker';
+import { Test } from '@nestjs/testing';
+import { AuthService } from '../auth/auth.service';
+import { ConfigService } from '../config/config.service';
+import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '../config/config.module';
+import { UserService } from '../user/user.service';
+import { Repository } from 'typeorm';
 
 describe('AuthController', () => {
   let authController: AuthController;
   let authService: AuthService;
-  const configService = new ConfigService();
 
   beforeAll(async () => {
+    const configService = new ConfigService();
     await Test.createTestingModule({
       imports: [
         ConfigModule.register({ folder: './config' }),
         TypeOrmModule.forRoot({
           type: 'mysql',
-          name: 'default',
+          name: 'test',
           host: configService.get('DB_HOST'),
           port: parseInt(configService.get('DB_PORT')),
           username: configService.get('DB_USER'),
@@ -39,20 +40,16 @@ describe('AuthController', () => {
         UserService,
         JwtService,
         {
-          provide: getRepositoryToken(User),
+          provide: getRepositoryToken(User, 'test'),
           useClass: Repository,
         },
         {
-          provide: getRepositoryToken(Profile),
+          provide: getRepositoryToken(Profile, 'test'),
           useClass: Repository,
         },
       ],
     }).compile();
 
-    // service = app.get(SftpService); // In that case I got the same error as in main test
-  });
-
-  beforeEach(async () => {
     const userRepository = getRepository(User);
     const profileRepository = getRepository(Profile);
     const jwtService = new JwtService();
@@ -63,6 +60,10 @@ describe('AuthController', () => {
     );
     authController = new AuthController(authService);
   });
+
+  afterAll(async () => {
+    getConnection('default').close()
+  })
 
   describe('Sign In', () => {
     it('Success in sign in', async () => {
@@ -113,4 +114,5 @@ describe('AuthController', () => {
       ).toBe(undefined);
     });
   });
+
 });
