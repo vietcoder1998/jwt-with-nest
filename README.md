@@ -38,11 +38,15 @@ $ yarn install
 - Create Table
 - In ./config add file .development.env, .test.env, .production.env
 - Example: 
+```bash
+  # username for MYSQL
   DB_USER=root
   DB_PASS=Anh123456./
   DB_HOST=localhost
   DB_PORT=3306
   DB_NAME=test_product
+  CONNECTION_NAME = testing
+```
 
 ## Running the app
 
