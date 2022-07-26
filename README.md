@@ -41,7 +41,7 @@ $ yarn install
 ```bash
   # username for MYSQL
   DB_USER=root
-  DB_PASS=Anh123456./
+  DB_PASS=
   DB_HOST=localhost
   DB_PORT=3306
   DB_NAME=test_product
