@@ -36,7 +36,18 @@ $ yarn install
 
 - MySQL
 - Create Table
-- In ./config add file .development.env, .test.env, .production.env
+- Add Config File:
+    ``` code
+    project/
+      config/ # insert file here
+        .development.env, 
+        .test.env, 
+        .production.env
+      src/
+        app.controller.ts 
+        ...
+      
+    ```
 - Example: 
 ```bash
   # username for MYSQL

@@ -78,7 +78,7 @@ describe('AuthController', () => {
   });
 
   describe('Sign In', () => {
-    it('Success in sign in', async () => {
+    it('fail in sign in', async () => {
       let result;
 
       jest.spyOn(authService, 'login').mockImplementation(() => result);
@@ -110,7 +110,7 @@ describe('AuthController', () => {
   });
 
   describe('Change password', () => {
-    it('Success in change pass', async () => {
+    it('fail in change pass', async () => {
       let result;
       const password = faker.internet.password();
       const old_password = password;

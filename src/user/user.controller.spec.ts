@@ -67,7 +67,7 @@ describe('UserController', () => {
   });
 
   describe('Find User', () => {
-    it('Find User Success', async () => {
+    it('fail in find user', async () => {
       let result;
 
       jest.spyOn(userService, 'find').mockImplementation(() => result);

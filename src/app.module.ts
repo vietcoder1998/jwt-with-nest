@@ -14,6 +14,9 @@ import { AuthModule } from './auth/auth.module';
 import { ProfileModule } from './profile/profile.module';
 import { UserModule } from './user/user.module';
 import { ConfigModule } from './config/config.module';
+import { ConfigService } from './config/config.service';
+
+export const configService = new ConfigService();
 
 @Module({
   imports: [
@@ -39,12 +42,12 @@ import { ConfigModule } from './config/config.module';
     /// mysql connect
     TypeOrmModule.forRoot({
       type: 'mysql',
-      name: 'default',
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT),
-      username: process.env.DB_USER,
-      password: process.env.DB_PASS,
-      database: process.env.DB_NAME,
+      name: configService.get('CONNECTION_NAME'),
+      host: configService.get('DB_HOST'),
+      port: parseInt(configService.get('DB_PORT')),
+      username: configService.get('DB_USER'),
+      password: configService.get('DB_PASS'),
+      database: configService.get('DB_NAME'),
       entities: [User, Profile],
       synchronize: true,
       logging: false,
@@ -70,16 +73,7 @@ export class AppModule {
 
     consumer
       .apply(AuthenticationMiddleware)
-      .exclude
-      // { path: '/app/config', method: RequestMethod.GET },
-      // { path: '/payment/ios/refund', method: RequestMethod.POST },
-      // { path: '/article/term', method: RequestMethod.GET },
-      // { path: '/article/policy', method: RequestMethod.GET },
-      // { path: '/article/what-is-secret-phrase', method: RequestMethod.GET },
-      // { path: '/article/user-guide', method: RequestMethod.GET },
-
-      // {path: '/auth/check', method: RequestMethod.GET},
-      ()
+      .exclude()
       .forRoutes({ path: '*', method: RequestMethod.ALL });
   }
 }

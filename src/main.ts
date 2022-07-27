@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-require('dotenv').config();
-
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { PassportModule } from '@nestjs/passport';
@@ -8,7 +5,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as path from 'path';
 import { middleware } from './app.middleware';
-import { AppModule } from './app.module';
+import { AppModule, configService } from './app.module';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 
@@ -64,5 +61,5 @@ async function bootstrap(): Promise<void> {
 // eslint-disable-next-line no-console
 bootstrap()
   .then(() => console.log('Bootstrap', new Date().toLocaleString()))
-  .then(() => console.log(`http://localhost:${process.env.PORT}/api`))
+  .then(() => console.log(`http://localhost:${configService.get('PORT')}/api`))
   .catch(console.error);

@@ -67,7 +67,7 @@ describe('ProfileController', () => {
   });
 
   describe('Find Profile', () => {
-    it('Find Profile', async () => {
+    it('fail in find profile', async () => {
       let result;
       const pid = '15';
 
